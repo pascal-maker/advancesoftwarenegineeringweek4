@@ -1,33 +1,30 @@
-namespace Students.Management.Library.Services;
+using System.Collections.Generic;
 using Students.Management.Library.Models;
 using Students.Management.Library.Repositories;
 
+namespace Students.Management.Library.Services;
+
 public class CourseService
 {
-    private readonly IFileRepository _courseRepository;
+    private readonly IFileRepository _repo;
 
-    public CourseService(IFileRepository courseRepository)
+    public CourseService(IFileRepository repo)
     {
-        _courseRepository = courseRepository;
+        _repo = repo;
     }
 
     public List<Course> GetCourses()
     {
-        return _courseRepository.GetCourses();
+        return _repo.GetCourses();
     }
 
     public Course? GetCourseById(int id)
     {
-        return _courseRepository.GetCourseById(id);
+        return _repo.GetCourseById(id);
     }
 
     public void AddCourse(Course course)
     {
-        _courseRepository.AddCourse(course);
-    }
-
-    public void AddStudentToCourse(int studentId, int courseId)
-    {
-        _courseRepository.AddStudentToCourse(studentId, courseId);
+        _repo.AddCourse(course);
     }
 }

@@ -6,79 +6,89 @@ using System.Linq;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Students.Management.Library.Models;
-using Students.Management.Library.Repositories;
 
-namespace Students.Management.Repository
+namespace Students.Management.Library.Repositories;
+
+public class CsvFileRepository : IFileRepository
 {
-    public class CsvFileRepository : IFileRepository
+    private const string StudentsFile = "csvfiles/students.csv";
+    private const string CoursesFile = "csvfiles/courses.csv";
+
+    // --------------------------------------------------------
+    // Students
+    // --------------------------------------------------------
+    public List<Student> GetStudents()
     {
-        private const string StudentsFile = "csvfiles/students.csv";
-        private const string CoursesFile = "csvfiles/courses.csv";
+        if (!File.Exists(StudentsFile)) 
+            return new List<Student>();
 
-        // ✅ Get all students
-        public List<Student> GetStudents()
+        using var reader = new StreamReader(StudentsFile);
+        using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            if (!File.Exists(StudentsFile)) return new List<Student>();
+            HasHeaderRecord = false // set to true if first row has headers
+        });
 
-            using (var reader = new StreamReader(StudentsFile))
-            using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false }))
-            {
-                return csv.GetRecords<Student>().ToList();
-            }
-        }
+        return csv.GetRecords<Student>().ToList();
+    }
 
-        // ✅ Get a student by ID
-        public Student GetStudentById(int id)
+    public Student? GetStudentById(int id)
+    {
+        return GetStudents().FirstOrDefault(s => s.Id == id);
+    }
+
+    public void AddStudent(Student student)
+    {
+        ArgumentNullException.ThrowIfNull(student);
+        var students = GetStudents();
+
+        // auto-increment Id
+        student.Id = students.Any() ? students.Max(s => s.Id) + 1 : 1;
+        students.Add(student);
+
+        using var writer = new StreamWriter(StudentsFile);
+        using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            return GetStudents().FirstOrDefault(s => s.Id == id);
-        }
+            HasHeaderRecord = false // set to true if you want header
+        });
+        csv.WriteRecords(students);
+    }
 
-        // ✅ Add a student
-        public void AddStudent(Student student)
+    // --------------------------------------------------------
+    // Courses
+    // --------------------------------------------------------
+    public List<Course> GetCourses()
+    {
+        if (!File.Exists(CoursesFile)) 
+            return new List<Course>();
+
+        using var reader = new StreamReader(CoursesFile);
+        using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            ArgumentNullException.ThrowIfNull(student);
-            var students = GetStudents();
-            student.Id = students.Any() ? students.Max(s => s.Id) + 1 : 1;
-            students.Add(student);
+            HasHeaderRecord = false
+        });
 
-            using (var writer = new StreamWriter(StudentsFile))
-            using (var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false }))
-            {
-                csv.WriteRecords(students);
-            }
-        }
+        return csv.GetRecords<Course>().ToList();
+    }
 
-        // ✅ Get all courses
-        public List<Course> GetCourses()
+    public Course? GetCourseById(int id)
+    {
+        return GetCourses().FirstOrDefault(c => c.Id == id);
+    }
+
+    public void AddCourse(Course course)
+    {
+        ArgumentNullException.ThrowIfNull(course);
+        var courses = GetCourses();
+
+        // auto-increment Id
+        course.Id = courses.Any() ? courses.Max(c => c.Id) + 1 : 1;
+        courses.Add(course);
+
+        using var writer = new StreamWriter(CoursesFile);
+        using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            if (!File.Exists(CoursesFile)) return new List<Course>();
-
-            using (var reader = new StreamReader(CoursesFile))
-            using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false }))
-            {
-                return csv.GetRecords<Course>().ToList();
-            }
-        }
-
-        // ✅ Get a course by ID
-        public Course GetCourseById(int id)
-        {
-            return GetCourses().FirstOrDefault(c => c.Id == id);
-        }
-
-        // ✅ Add a course
-        public void AddCourse(Course course)
-        {
-            ArgumentNullException.ThrowIfNull(course);
-            var courses = GetCourses();
-            course.Id = courses.Any() ? courses.Max(c => c.Id) + 1 : 1;
-            courses.Add(course);
-
-            using (var writer = new StreamWriter(CoursesFile))
-            using (var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false }))
-            {
-                csv.WriteRecords(courses);
-            }
-        }
+            HasHeaderRecord = false
+        });
+        csv.WriteRecords(courses);
     }
 }

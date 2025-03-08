@@ -1,3 +1,4 @@
 /Users/pascal-maker/2024-2025-ctai-advanced-software-engineering-week04-pascal-student-maker/Exercise02/obj/Debug/net9.0/Exercise02.csproj.AssemblyReference.cache
 /Users/pascal-maker/2024-2025-ctai-advanced-software-engineering-week04-pascal-student-maker/Exercise02/obj/Debug/net9.0/Exercise02.GeneratedMSBuildEditorConfig.editorconfig
 /Users/pascal-maker/2024-2025-ctai-advanced-software-engineering-week04-pascal-student-maker/Exercise02/obj/Debug/net9.0/Exercise02.csproj.CoreCompileInputs.cache
+/Users/pascal-maker/2024-2025-ctai-advanced-software-engineering-week04-pascal-student-maker/Exercise02/obj/Debug/net9.0/Exercise02.sourcelink.json

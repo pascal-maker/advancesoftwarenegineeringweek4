@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ZgfUp8TGfn8=",
+  "success": true,
+  "projectFilePath": "/Users/pascal-maker/2024-2025-ctai-advanced-software-engineering-week04-pascal-student-maker/Exercise03/Exercise03.csproj",
+  "expectedPackageFiles": [
+    "/Users/pascal-maker/.nuget/packages/csvhelper/33.0.1/csvhelper.33.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}

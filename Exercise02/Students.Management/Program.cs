@@ -1,153 +1,135 @@
 ﻿using System;
+using Students.Management.Library.Models;
+using Students.Management.Library.Repositories;
+using Students.Management.Library.Services;
 
-public class Program
+class Program
 {
-    public static void Main()
+    static void Main()
     {
-        int choice = -1;
-        do
-        {
-            // Display menu options
-            Console.WriteLine("\nMenu:");
-            Console.WriteLine("1. List Students");
-            Console.WriteLine("2. List Courses");
-            Console.WriteLine("3. Add Student");
-            Console.WriteLine("4. Add Course");
-            Console.WriteLine("5. Enroll Student in Course");
-            Console.WriteLine("0. Exit");
-            Console.Write("Enter your choice: ");
-            
-            string input = Console.ReadLine();
-            if (!int.TryParse(input, out choice))
-            {
-                // Input was not a valid integer
-                Console.WriteLine("Invalid input. Please enter a number from the menu options.");
-                choice = -1;
-                continue;  // skip to next iteration to ask again
-            }
+        IFileRepository csvRepo = new CsvFileRepository();
+        var studentService = new StudentService(csvRepo);
+        var courseService = new CourseService(csvRepo);
 
+        while (true)
+        {
+            Console.WriteLine("\nCourse Management System");
+            Console.WriteLine("1. List all students");
+            Console.WriteLine("2. Search student by ID");
+            Console.WriteLine("3. Add a new student");
+            Console.WriteLine("4. List all courses");
+            Console.WriteLine("5. Search course by ID");
+            Console.WriteLine("6. Add a new course");
+            Console.WriteLine("7. Exit");
+            Console.Write("Select an option: ");
+            
+            string? choice = Console.ReadLine();
             switch (choice)
             {
-                case 1:
-                    // List all students
-                    CourseManagement.ListStudents();
-                    break;
-                
-                case 2:
-                    // List all courses
-                    CourseManagement.ListCourses();
-                    break;
-                
-                case 3:
-                    // Add a new student (with input validation)
-                    Console.Write("Enter Student ID: ");
-                    string sidInput = Console.ReadLine();
-                    if (!int.TryParse(sidInput, out int newStudentId))
-                    {
-                        Console.WriteLine("Invalid ID. Please enter a numeric value.");
-                        break;
-                    }
-                    Console.Write("Enter Name: ");
-                    string studentName = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(studentName))
-                    {
-                        Console.WriteLine("Name cannot be empty.");
-                        break;
-                    }
-                    Console.Write("Enter Email: ");
-                    string studentEmail = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(studentEmail))
-                    {
-                        Console.WriteLine("Email cannot be empty.");
-                        break;
-                    }
-                    Console.Write("Enter Class Name: ");
-                    string className = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(className))
-                    {
-                        Console.WriteLine("Class Name cannot be empty.");
-                        break;
-                    }
-                    // For enrollment date, use current date (or prompt user if required)
-                    DateTime enrollmentDate = DateTime.Now;
-                    
-                    // Create Student object and add to list
-                    Student newStudent = new Student(newStudentId, studentName, studentEmail, className, enrollmentDate);
-                    CourseManagement.AddStudent(newStudent);
-                    break;
-                
-                case 4:
-                    // Add a new course (with input validation)
-                    Console.Write("Enter Course ID: ");
-                    string cidInput = Console.ReadLine();
-                    if (!int.TryParse(cidInput, out int newCourseId))
-                    {
-                        Console.WriteLine("Invalid ID. Please enter a numeric value.");
-                        break;
-                    }
-                    Console.Write("Enter Course Title: ");
-                    string courseTitle = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(courseTitle))
-                    {
-                        Console.WriteLine("Course title cannot be empty.");
-                        break;
-                    }
-                    Console.Write("Enter Course Price: ");
-                    string priceInput = Console.ReadLine();
-                    if (!double.TryParse(priceInput, out double coursePrice))
-                    {
-                        Console.WriteLine("Invalid price. Please enter a numeric value.");
-                        break;
-                    }
-                    
-                    // Create Course object and add to list
-                    Course newCourse = new Course(newCourseId, courseTitle, coursePrice);
-                    CourseManagement.AddCourse(newCourse);
-                    break;
-                
-                case 5:
-                    // Enroll a student in a course (by IDs)
-                    Console.Write("Enter Student ID to enroll: ");
-                    string enrollStudInput = Console.ReadLine();
-                    Console.Write("Enter Course ID to enroll in: ");
-                    string enrollCourseInput = Console.ReadLine();
-                    if (!int.TryParse(enrollStudInput, out int enrollStudentId) ||
-                        !int.TryParse(enrollCourseInput, out int enrollCourseId))
-                    {
-                        Console.WriteLine("Invalid input. Please enter numeric values for IDs.");
-                        break;
-                    }
-                    
-                    Student studentToEnroll = CourseManagement.FindStudentById(enrollStudentId);
-                    Course courseToEnroll = CourseManagement.FindCourseById(enrollCourseId);
-                    if (studentToEnroll == null || courseToEnroll == null)
-                    {
-                        // Handle nulls gracefully by informing the user
-                        if (studentToEnroll == null) Console.WriteLine("Student not found.");
-                        if (courseToEnroll == null) Console.WriteLine("Course not found.");
-                    }
+                case "1":
+                    var allStudents = studentService.GetStudents();
+                    if (allStudents.Count == 0)
+                        Console.WriteLine("No students found.");
                     else
+                        foreach (var s in allStudents) Console.WriteLine(s);
+                    break;
+
+                case "2":
+                    Console.Write("Enter student ID: ");
+                    if (!int.TryParse(Console.ReadLine(), out int studentId))
                     {
-                        // Normally, we would record this enrollment in a list or database
-                        // Here we just confirm the action, using ?? to safely convert objects to strings
-                        Console.WriteLine(
-                            $"{studentToEnroll?.ToString() ?? "Unknown Student"} enrolled in " + 
-                            $"{courseToEnroll?.ToString() ?? "Unknown Course"} successfully."
-                        );
+                        Console.WriteLine("Invalid ID.");
+                        break;
                     }
+                    var stud = studentService.GetStudentById(studentId);
+                    Console.WriteLine(stud?.ToString() ?? "Student not found.");
                     break;
-                
-                case 0:
-                    // Exit the program
-                    Console.WriteLine("Exiting the program. Goodbye!");
+
+                case "3":
+                    Console.Write("Student name: ");
+                    string? sName = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(sName))
+                    {
+                        Console.WriteLine("Invalid name.");
+                        break;
+                    }
+                    Console.Write("Student email: ");
+                    string? sEmail = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(sEmail))
+                    {
+                        Console.WriteLine("Invalid email.");
+                        break;
+                    }
+                    Console.Write("Student class: ");
+                    string? sClass = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(sClass))
+                    {
+                        Console.WriteLine("Invalid class.");
+                        break;
+                    }
+                    var newStudent = new Student 
+                    {
+                        // ID auto-assigned in repository
+                        Name = sName,
+                        Email = sEmail,
+                        Class = sClass,
+                        EnrollmentDate = DateTime.Now
+                    };
+                    studentService.AddStudent(newStudent);
+                    Console.WriteLine("New student added.");
                     break;
-                
+
+                case "4":
+                    var allCourses = courseService.GetCourses();
+                    if (allCourses.Count == 0)
+                        Console.WriteLine("No courses found.");
+                    else
+                        foreach (var c in allCourses) Console.WriteLine(c);
+                    break;
+
+                case "5":
+                    Console.Write("Enter course ID: ");
+                    if (!int.TryParse(Console.ReadLine(), out int courseId))
+                    {
+                        Console.WriteLine("Invalid ID.");
+                        break;
+                    }
+                    var crs = courseService.GetCourseById(courseId);
+                    Console.WriteLine(crs?.ToString() ?? "Course not found.");
+                    break;
+
+                case "6":
+                    Console.Write("Course title: ");
+                    string? title = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(title))
+                    {
+                        Console.WriteLine("Invalid title.");
+                        break;
+                    }
+                    Console.Write("Course price: ");
+                    if (!double.TryParse(Console.ReadLine(), out double price))
+                    {
+                        Console.WriteLine("Invalid price.");
+                        break;
+                    }
+                    var newCourse = new Course
+                    {
+                        // ID auto-assigned in repository
+                        Title = title,
+                        Price = price
+                    };
+                    courseService.AddCourse(newCourse);
+                    Console.WriteLine("New course added.");
+                    break;
+
+                case "7":
+                    Console.WriteLine("Goodbye!");
+                    return;
+
                 default:
-                    // Choice is outside the expected range
-                    Console.WriteLine("Please select a valid option from the menu.");
+                    Console.WriteLine("Invalid choice.");
                     break;
             }
         }
-        while (choice != 0);
     }
 }

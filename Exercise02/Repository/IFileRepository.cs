@@ -1,15 +1,17 @@
 using System.Collections.Generic;
+using Students.Management.Library.Models;
 
-namespace Students.Management.Library.Repositories
+namespace Students.Management.Library.Repositories;
+
+public interface IFileRepository
 {
-    public interface IFileRepository
-    {
-        List<Student> GetStudents();
-        Student GetStudentById(int id);
-        void AddStudent(Student student);
-        
-        List<Course> GetCourses();
-        Course GetCourseById(int id);
-        void AddCourse(Course course);
-    }
+    // Students
+    List<Student> GetStudents();
+    Student? GetStudentById(int id);
+    void AddStudent(Student student);
+
+    // Courses
+    List<Course> GetCourses();
+    Course? GetCourseById(int id);
+    void AddCourse(Course course);
 }
